@@ -85,3 +85,52 @@ describe('#transformPhotoObj()', function() {
         expect(actual).to.eql(expected);
     });
 });
+
+describe('#fetchFlickrData()', function() {
+    it(
+        'should take an API key and fetcher function argument and return a promise for JSON data',
+        function(done) {
+            var apiKey      = 'does not matter much what this is right now',
+            fakeData    = {
+                'photos': {
+                    'page':    1,
+                    'pages':   2872,
+                    'perpage': 100,
+                    'total':   '287170',
+                    'photo':   [{
+                        'id':       '24770505034',
+                        'owner':    '97248275@N03',
+                        'secret':   '31a9986429',
+                        'server':   '1577',
+                        'farm':     2,
+                        'title':    '20160229090898',
+                        'ispublic': 1,
+                        'isfriend': 0,
+                        'isfamily': 0
+                    }, {
+                        'id':       '24770504484',
+                        'owner':    '97248275@N03',
+                        'secret':   '69dd90d5dd',
+                        'server':   '1451',
+                        'farm':     2,
+                        'title':    '20160229090903',
+                        'ispublic': 1,
+                        'isfriend': 0,
+                        'isfamily': 0
+                    }]
+                }
+            },
+            fakeFetcher = function(url) {
+                var expectedURL = 'https://api.flickr.com/services/rest/?method=flickr.photos.search&api_key='
+                            + apiKey + '&text=pugs&format=json&nojsoncallback=1';
+                expect(url).to.equal(expectedURL);
+                return Promise.resolve(fakeData);
+            };
+
+            FlickrFetcher.fetchFlickrData(apiKey, fakeFetcher).then(function(actual) {
+                expect(actual).to.eql(fakeData);
+                done();
+            }
+        );
+    });
+})
